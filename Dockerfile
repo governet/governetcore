@@ -1,25 +1,20 @@
-# Start with a base image containing Java runtime
-FROM openjdk:8-jdk-alpine
-
-# Add Maintainer Info
 LABEL maintainer="d.c.budris@gmail.com"
 
-# Add a volume pointing to /tmp
-VOLUME /tmp
+# Clone the source of the application
+FROM alpine/git as clone
+WORKDIR /app
+RUN git clone https://github.com/governet/governetcore.git
 
-# The application's jar file
-ARG JAR_FILE=target/governetcore-0.0.1-SNAPSHOT.jar
+# Build the application with Maven
+FROM maven:3.5-jdk-8-alpine as build
+WORKDIR /app
+COPY --from=clone /app/governetcore /app
+RUN mvn install
 
-# Add the application's jar to the container
-ADD target/${JAR_FILE} governetcore.jar
+# Run the application server
+FROM openjdk:8-jdk-alpine
+WORKDIR /app
+COPY --from=build /app/target/governetcore-0.0.1-SNAPSHOT.jar /app
 
-CMD mkdir data
-
-# Add the datafiles from the local machine
-ADD data data
-
-# Make port 8080 available to the world outside this container
 EXPOSE 8080
-
-# Run the jar file
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/governetcore.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/governetcore-0.0.1-SNAPSHOT.jar"]
