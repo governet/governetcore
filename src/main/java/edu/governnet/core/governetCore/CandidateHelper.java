@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CandidateHelper {
+    final static String FILE_PREFIX = "cn";
+    final static String FILE_FORMAT = "txt";
+
     List<String> candidateFile;
     List<Candidate> candidateList = new ArrayList<>();
 
@@ -14,6 +17,9 @@ public class CandidateHelper {
         this.candidateFile = candidateList;
     }
 
+    /**
+     * Generate candidate objects from the standard FEC bulk data download format.
+     */
     public void buildCandidatesFromFile(){
         for (String candidateInfo : candidateFile) {
             String[] candidateInfoFields = candidateInfo.split("\\|", -1);

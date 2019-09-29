@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ContributionHelper {
+    final static String FILE_PREFIX = "itpas2";
+    final static String FILE_FORMAT = "txt";
+
     List<String> contributionFile;
     List<Contribution> contributionList = new ArrayList<>();
 
@@ -14,6 +17,9 @@ public class ContributionHelper {
         this.contributionFile = contributionList;
     }
 
+    /**
+     * Generate contribution objects from the standard FEC bulk data download format.
+     */
     public void builContributionsFromFile(){
         for (String contributionInfo : contributionFile) {
             String[] contributionInfoFields = contributionInfo.split("\\|", -1);

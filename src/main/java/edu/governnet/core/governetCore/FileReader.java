@@ -21,7 +21,8 @@ public class FileReader {
         try {
             fileContentsUnmodified = Files.readAllLines(filePath, charset);
         } catch (IOException e) {
-            System.out.println(e);
+            throw new IllegalStateException(
+                    String.format("Failed to load file {}/{}", directoryPath, fileName), e);
         }
     }
 }

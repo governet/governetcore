@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class Controller {
+    /**
+     * Initialize the application by loading the data from file at runtime,
+     * using the AppInit and AppContext for dependency and configuration injection.
+     */
     AppInit init = new AppInit("/data/");
     AppContext context = new AppContext(init);
 

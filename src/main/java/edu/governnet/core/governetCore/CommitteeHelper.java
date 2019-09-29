@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CommitteeHelper {
+    final static String FILE_PREFIX = "cm";
+    final static String FILE_FORMAT = "txt";
+
     List<String> committeeFile;
     List<Committee> committeeList = new ArrayList<>();
 
@@ -14,6 +17,9 @@ public class CommitteeHelper {
         this.committeeFile = committeeList;
     }
 
+    /**
+     * Generate committee objects from the standard FEC bulk data download format.
+     */
     public void buildCommitteesFromFile(){
         for (String committeeInfo : committeeFile) {
             String[] committeeInfoFields = committeeInfo.split("\\|", -1);
