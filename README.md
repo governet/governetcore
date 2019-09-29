@@ -16,3 +16,7 @@ The core of the governet API.
 
 - Check out the data
 `curl 127.0.0.1:8080/candidates/
+
+## Ref
+(Docker Hub)[https://hub.docker.com/r/danbudris/governetcore]
+(Github)[https://github.com/governet/governetcore]
