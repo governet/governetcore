@@ -8,20 +8,22 @@ import java.util.stream.Collectors;
 public class ContributionHelper {
     final static String FILE_PREFIX = "itpas2";
     final static String FILE_FORMAT = "txt";
+    final static String FILE_NAME = FILE_PREFIX + "." + FILE_FORMAT;
 
-    List<String> contributionFile;
     List<Contribution> contributionList = new ArrayList<>();
 
 
-    public ContributionHelper(List<String> contributionList) {
-        this.contributionFile = contributionList;
+    public ContributionHelper() {
+
     }
 
     /**
      * Generate contribution objects from the standard FEC bulk data download format.
      */
-    public void builContributionsFromFile(){
-        for (String contributionInfo : contributionFile) {
+    public void buildContributionsFromFile(String dataDirectory){
+        FileReader fileReader = new FileReader();
+        List<String> committeesData = fileReader.processFile(dataDirectory, FILE_NAME);
+        for (String contributionInfo : committeesData) {
             String[] contributionInfoFields = contributionInfo.split("\\|", -1);
 
             List<String> contributionsProcessed = Arrays.stream(contributionInfoFields)

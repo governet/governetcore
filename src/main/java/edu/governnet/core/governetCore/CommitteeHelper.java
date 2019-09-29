@@ -8,20 +8,21 @@ import java.util.stream.Collectors;
 public class CommitteeHelper {
     final static String FILE_PREFIX = "cm";
     final static String FILE_FORMAT = "txt";
+    final static String FILE_NAME = FILE_PREFIX + "." + FILE_FORMAT;
 
-    List<String> committeeFile;
     List<Committee> committeeList = new ArrayList<>();
 
+    public CommitteeHelper() {
 
-    public CommitteeHelper(List<String> committeeList) {
-        this.committeeFile = committeeList;
     }
 
     /**
      * Generate committee objects from the standard FEC bulk data download format.
      */
-    public void buildCommitteesFromFile(){
-        for (String committeeInfo : committeeFile) {
+    public void buildCommitteesFromFile(String dataDirectory){
+        FileReader fileReader = new FileReader();
+        List<String> committeesData = fileReader.processFile(dataDirectory, FILE_NAME);
+        for (String committeeInfo : committeesData) {
             String[] committeeInfoFields = committeeInfo.split("\\|", -1);
 
             List<String> committeesProcessed = Arrays.stream(committeeInfoFields)

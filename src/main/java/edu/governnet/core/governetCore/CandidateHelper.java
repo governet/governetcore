@@ -8,20 +8,21 @@ import java.util.stream.Collectors;
 public class CandidateHelper {
     final static String FILE_PREFIX = "cn";
     final static String FILE_FORMAT = "txt";
+    final static String FILE_NAME = FILE_PREFIX + "." + FILE_FORMAT;
 
-    List<String> candidateFile;
+    String dataDirectory;
     List<Candidate> candidateList = new ArrayList<>();
 
-
-    public CandidateHelper(List<String> candidateList) {
-        this.candidateFile = candidateList;
+    public CandidateHelper() {
     }
 
     /**
      * Generate candidate objects from the standard FEC bulk data download format.
      */
-    public void buildCandidatesFromFile(){
-        for (String candidateInfo : candidateFile) {
+    public void buildCandidatesFromFile(String dataDirectory){
+        FileReader fileReader = new FileReader();
+        List<String> candidatesData = fileReader.processFile(dataDirectory, FILE_NAME);
+        for (String candidateInfo : candidatesData) {
             String[] candidateInfoFields = candidateInfo.split("\\|", -1);
 
             List<String> candidatesProcessed = Arrays.stream(candidateInfoFields)

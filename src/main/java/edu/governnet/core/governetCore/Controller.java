@@ -16,7 +16,7 @@ public class Controller {
      * Initialize the application by loading the data from file at runtime,
      * using the AppInit and AppContext for dependency and configuration injection.
      */
-    AppInit init = new AppInit("/data/");
+    AppInit init = new AppInit().withDataDirectory("/data/");
     AppContext context = new AppContext(init);
 
     @RequestMapping("/candidates")
@@ -108,5 +108,4 @@ public class Controller {
                 .filter(c -> c.getTransactionId().matches(contId))
                 .collect(Collectors.toList());
     }
-
 }
