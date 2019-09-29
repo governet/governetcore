@@ -2,9 +2,9 @@
 The core of the governet API.
 
 ## Running governetcore API
-Check out [Docker Hub](https://hub.docker.com/r/danbudris/governetcore) if you just want to run the app.
+`docker pull danbudris/governetcore && docker run -p 8080:8080 danbudris/governetcore`
 
-## Getting started with the app
+## Getting started with development
 - Clone the repo
 `git clone https://github.com/governet/governetcore.git`
 
