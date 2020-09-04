@@ -26,7 +26,7 @@ public class CandidateHelper {
             String[] candidateInfoFields = candidateInfo.split("\\|", -1);
 
             List<String> candidatesProcessed = Arrays.stream(candidateInfoFields)
-                    .map(field -> field.trim())
+                    .map(String::trim)
                     .collect(Collectors.toList());
 
             Candidate candidate = new Candidate.CandidateBuilder()

@@ -37,7 +37,8 @@ public class ElectoralContest {
     }
 
     private void filterCandidates() {
-        candidates = context.getCandidates().stream()
+        candidates = context.getCandidates()
+                .stream()
                 .filter(c -> c.getElectionYear().equals(electionYear))
                 .filter(c -> c.getState().equals(state))
                 .collect(Collectors.toList());
@@ -54,10 +55,10 @@ public class ElectoralContest {
 
     private void filterCommittees() {
         committees = context.getCommittees().stream()
-                .filter(cmte ->
-                        contributions.stream()
-                                .anyMatch(cont ->
-                                        cmte.getCommitteeId().equals(cont.getCommitteeId())))
+                .filter(cmte -> contributions
+                        .stream()
+                        .anyMatch(cont ->
+                                cmte.getCommitteeId().equals(cont.getCommitteeId())))
                 .collect(Collectors.toList());
     }
 

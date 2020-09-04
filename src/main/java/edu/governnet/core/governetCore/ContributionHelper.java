@@ -27,7 +27,7 @@ public class ContributionHelper {
             String[] contributionInfoFields = contributionInfo.split("\\|", -1);
 
             List<String> contributionsProcessed = Arrays.stream(contributionInfoFields)
-                    .map(field -> field.trim())
+                    .map(String::trim)
                     .collect(Collectors.toList());
 
             Contribution contribution = new Contribution.ContributionBuilder()
