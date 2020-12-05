@@ -23,4 +23,5 @@ Provides a library to map FEC data sets to java objects and load them into appli
 
 ## Ref
 [Docker Hub](https://hub.docker.com/r/danbudris/governetcore)
-[Github[(https://github.com/governet/governetcore)
+
+[Github](https://github.com/governet/governetcore)
