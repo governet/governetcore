@@ -1,5 +1,9 @@
 # GovernetCore
-The core of the governet API.
+The core of the governet API. 
+
+Provides a spring-boot application which serves election information extracted from Federal Election Commission data sets.
+
+Provides a library to map FEC data sets to java objects and load them into application memory.
 
 ## Running governetcore API
 `docker pull danbudris/governetcore && docker run -p 8080:8080 danbudris/governetcore`
