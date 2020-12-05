@@ -1,5 +1,6 @@
 package edu.governet.core.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,6 +8,7 @@ import edu.governet.core.AppInit;
 import edu.governet.core.fecdataaccess.Candidate;
 import edu.governet.core.fecdataaccess.Committee;
 import edu.governet.core.fecdataaccess.Contribution;
+import edu.governet.core.fecdataaccess.Network;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -136,5 +138,25 @@ public class Controller {
                 .stream()
                 .filter(c -> c.getTransactionId().matches(contId))
                 .collect(Collectors.toList());
+    }
+
+    @CrossOrigin(origins = CROSS_ORIGIN_ACCEPT_LOCAL)
+    @RequestMapping(path="/network")
+    public Network network(){
+
+        List<Network.NetworkNode> nodes = context.getCandidates()
+                .stream()
+                .limit(1000)
+                .map(c -> new Network.NetworkNode(
+                        c.getCandidateId(), c.getCandidateName(), "female", c.getPartyDesignation()))
+                .collect(Collectors.toList());
+
+        List<Network.NetworkLink> links = context.getCandidates()
+                .stream()
+                .limit(1000)
+                .map(c -> new Network.NetworkLink(c.getCandidateId(), c.getCandidateId()))
+                .collect(Collectors.toList());
+
+        return new Network(nodes, links);
     }
 }
