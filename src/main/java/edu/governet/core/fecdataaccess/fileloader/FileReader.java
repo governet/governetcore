@@ -1,7 +1,8 @@
-package edu.governnet.core.governetCore;
+package edu.governet.core.fecdataaccess.fileloader;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,12 +18,12 @@ public class FileReader {
 
     private void readFile(String directoryPath, String fileName){
         Path filePath = Paths.get(directoryPath,fileName);
-        Charset charset = Charset.forName("ISO-8859-1");
+        Charset charset = StandardCharsets.ISO_8859_1;
         try {
             fileContentsUnmodified = Files.readAllLines(filePath, charset);
         } catch (IOException e) {
             throw new IllegalStateException(
-                    String.format("Failed to load file {}/{}", directoryPath, fileName), e);
+                    String.format("Failed to load file %s/%s", directoryPath, fileName), e);
         }
     }
 }

@@ -1,11 +1,14 @@
-package edu.governnet.core.governetCore;
+package edu.governet.core.fecdataaccess.fileloader;
+
+import edu.governet.core.fecdataaccess.Contribution;
+import edu.governet.core.fecdataaccess.fileloader.FileReader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ContributionHelper {
+public class ContributionLoader {
     final static String FILE_PREFIX = "itpas2";
     final static String FILE_FORMAT = "txt";
     final static String FILE_NAME = FILE_PREFIX + "." + FILE_FORMAT;
@@ -13,7 +16,7 @@ public class ContributionHelper {
     List<Contribution> contributionList = new ArrayList<>();
 
 
-    public ContributionHelper() {
+    public ContributionLoader() {
 
     }
 

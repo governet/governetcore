@@ -1,9 +1,14 @@
-package edu.governnet.core.governetCore;
+package edu.governet.core.api;
+
+import edu.governet.core.AppInit;
+import edu.governet.core.fecdataaccess.Candidate;
+import edu.governet.core.fecdataaccess.Committee;
+import edu.governet.core.fecdataaccess.Contribution;
 
 import java.util.List;
 
 public class AppContext {
-    private AppInit electionData;
+    private final AppInit electionData;
 
     AppContext(AppInit appInit){
         electionData = appInit;

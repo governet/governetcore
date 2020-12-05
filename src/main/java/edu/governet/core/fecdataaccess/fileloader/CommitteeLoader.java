@@ -1,18 +1,21 @@
-package edu.governnet.core.governetCore;
+package edu.governet.core.fecdataaccess.fileloader;
+
+import edu.governet.core.fecdataaccess.Committee;
+import edu.governet.core.fecdataaccess.fileloader.FileReader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CommitteeHelper {
+public class CommitteeLoader {
     final static String FILE_PREFIX = "cm";
     final static String FILE_FORMAT = "txt";
     final static String FILE_NAME = FILE_PREFIX + "." + FILE_FORMAT;
 
     List<Committee> committeeList = new ArrayList<>();
 
-    public CommitteeHelper() {
+    public CommitteeLoader() {
 
     }
 

@@ -1,4 +1,6 @@
-package edu.governnet.core.governetCore;
+package edu.governet.core.fecdataaccess;
+
+import edu.governet.core.api.AppContext;
 
 import java.util.List;
 import java.util.stream.Collectors;

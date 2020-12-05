@@ -1,4 +1,9 @@
-package edu.governnet.core.governetCore;
+package edu.governet.core;
+
+import edu.governet.core.fecdataaccess.*;
+import edu.governet.core.fecdataaccess.fileloader.CandidateLoader;
+import edu.governet.core.fecdataaccess.fileloader.CommitteeLoader;
+import edu.governet.core.fecdataaccess.fileloader.ContributionLoader;
 
 import java.util.List;
 
@@ -25,21 +30,21 @@ public class AppInit {
     }
 
     private void initCandidates(){
-        CandidateHelper candidateHelper = new CandidateHelper();
-        candidateHelper.buildCandidatesFromFile(dataDirectory);
-        candidates = candidateHelper.getCandidateList();
+        CandidateLoader candidateLoader = new CandidateLoader();
+        candidateLoader.buildCandidatesFromFile(dataDirectory);
+        candidates = candidateLoader.getCandidateList();
     }
 
     private void initCommittees(){
-        CommitteeHelper committeeHelper = new CommitteeHelper();
+        CommitteeLoader committeeHelper = new CommitteeLoader();
         committeeHelper.buildCommitteesFromFile(dataDirectory);
         committees = committeeHelper.getCommitteeList();
     }
 
     private void initContributions(){
-        ContributionHelper contributionHelper = new ContributionHelper();
-        contributionHelper.buildContributionsFromFile(dataDirectory);
-        contributions= contributionHelper.getContributionList();
+        ContributionLoader contributionLoader = new ContributionLoader();
+        contributionLoader.buildContributionsFromFile(dataDirectory);
+        contributions= contributionLoader.getContributionList();
     }
 
     public void initApp(){

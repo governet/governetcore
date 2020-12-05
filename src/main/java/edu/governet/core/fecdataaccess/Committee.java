@@ -1,4 +1,4 @@
-package edu.governnet.core.governetCore;
+package edu.governet.core.fecdataaccess;
 
 public class Committee {
     private String committeeId;

@@ -1,11 +1,14 @@
-package edu.governnet.core.governetCore;
+package edu.governet.core.fecdataaccess.fileloader;
+
+import edu.governet.core.fecdataaccess.Candidate;
+import edu.governet.core.fecdataaccess.fileloader.FileReader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CandidateHelper {
+public class CandidateLoader {
     final static String FILE_PREFIX = "cn";
     final static String FILE_FORMAT = "txt";
     final static String FILE_NAME = FILE_PREFIX + "." + FILE_FORMAT;
@@ -13,7 +16,7 @@ public class CandidateHelper {
     String dataDirectory;
     List<Candidate> candidateList = new ArrayList<>();
 
-    public CandidateHelper() {
+    public CandidateLoader() {
     }
 
     /**

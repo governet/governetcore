@@ -10,7 +10,7 @@ LABEL maintainer="d.c.budris@gmail.com"
 WORKDIR /app
 COPY --from=clone /app /app
 RUN ln -s /app/data /data
-RUN mvn install
+RUN mvn clean install
 
 # Run the application server
 FROM openjdk:8-jdk-alpine
@@ -23,4 +23,4 @@ COPY --from=build /app/data .
 
 WORKDIR /app
 COPY --from=build /app/target/governetcore-0.0.1-SNAPSHOT.jar /app
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/governetcore-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/governetcore-0.0.1-SNAPSHOT.jar","-Drun.arguments=--customArgument=custom"]
