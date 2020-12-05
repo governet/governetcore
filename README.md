@@ -22,5 +22,5 @@ Provides a library to map FEC data sets to java objects and load them into appli
 `curl 127.0.0.1:8080/candidates/
 
 ## Ref
-(Docker Hub)[https://hub.docker.com/r/danbudris/governetcore]
-(Github)[https://github.com/governet/governetcore]
+[Docker Hub](https://hub.docker.com/r/danbudris/governetcore)
+[Github[(https://github.com/governet/governetcore)
