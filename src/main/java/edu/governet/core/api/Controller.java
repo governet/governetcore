@@ -1,7 +1,6 @@
 package edu.governet.core.api;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import edu.governet.core.AppInit;
@@ -144,19 +143,68 @@ public class Controller {
     @RequestMapping(path="/network")
     public Network network(){
 
+        List<String> firstLink = context.getCandidates()
+                .stream()
+                .limit(10000)
+                .map(Candidate::getCandidateId)
+                .collect(Collectors.toList());
+
+        List<String> secondLink = new ArrayList<>(firstLink);
+
+        Collections.reverse(secondLink);
+
+        List<Network.NetworkLink> links = firstLink
+                .stream()
+                .limit(100000)
+                .map(L -> new Network.NetworkLink(L, secondLink.get(getRandomNumber())))
+                .collect(Collectors.toList());
+
         List<Network.NetworkNode> nodes = context.getCandidates()
                 .stream()
-                .limit(1000)
+                .limit(100000)
                 .map(c -> new Network.NetworkNode(
                         c.getCandidateId(), c.getCandidateName(), "female", c.getPartyDesignation()))
                 .collect(Collectors.toList());
 
-        List<Network.NetworkLink> links = context.getCandidates()
-                .stream()
-                .limit(1000)
-                .map(c -> new Network.NetworkLink(c.getCandidateId(), c.getCandidateId()))
+        return new Network(nodes, links);
+    }
+
+    public int getRandomNumber() {
+        int min = 0;
+        int max = 7590;
+        Random random = new Random();
+        return random.ints(min, max)
+                .findFirst()
+                .getAsInt();
+    }
+
+    @CrossOrigin(origins = CROSS_ORIGIN_ACCEPT_LOCAL)
+    @RequestMapping(path="/network/contributions")
+    public Map<String, Map<String, List<Contribution>>> contributionNetwork(){
+
+        List<Contribution> majorContributions = context.getContributions().stream()
+                .filter(c -> Long.parseLong(c.getTransactionAmmount()) > 5000)
                 .collect(Collectors.toList());
 
-        return new Network(nodes, links);
+        Long totalContributions = context.getContributions().stream()
+                .map(c -> Long.parseLong(c.getTransactionAmmount()))
+                .reduce(0L, Long::sum);
+
+        HashMap<String, ArrayList<String>> candCommitteeLinkage = new HashMap<>();
+        context.getContributions()
+                .forEach(c -> candCommitteeLinkage.get(c.getCandidateId()));
+
+        Map<String, List<Contribution>> contributionsByCandidate = context.getContributions()
+                .stream()
+                .collect(Collectors.groupingBy(Contribution::getCandidateId));
+
+        Map<String, Map<String, List<Contribution>>> contributionsToCandByCmte = context.getContributions()
+                .stream()
+                .filter(c -> Long.parseLong(c.getTransactionAmmount()) >= 500)
+                .collect(Collectors.groupingBy(
+                        Contribution::getCandidateId, Collectors.groupingBy(
+                                Contribution::getCommitteeId)));
+
+        return contributionsToCandByCmte;
     }
 }
