@@ -10,6 +10,9 @@ import edu.governet.core.fecdataaccess.Contribution;
 import edu.governet.core.fecdataaccess.Network;
 import org.springframework.web.bind.annotation.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 @RestController
 public class Controller {
     /**
@@ -18,6 +21,8 @@ public class Controller {
      */
     private static final String DATA_SUBDIRECTORY = "/data/";
     private static final String CROSS_ORIGIN_ACCEPT_LOCAL = "http://localhost:8081";
+
+    private static final Logger logger = LogManager.getLogger(Controller.class);
 
     AppInit init = new AppInit().withDataDirectory(DATA_SUBDIRECTORY);
     AppContext context = new AppContext(init);
@@ -169,7 +174,7 @@ public class Controller {
         return new Network(nodes, links);
     }
 
-    public int getRandomNumber() {
+    private int getRandomNumber() {
         int min = 0;
         int max = 7590;
         Random random = new Random();
@@ -206,5 +211,88 @@ public class Controller {
                                 Contribution::getCommitteeId)));
 
         return contributionsToCandByCmte;
+    }
+
+    @CrossOrigin(origins = CROSS_ORIGIN_ACCEPT_LOCAL)
+    @RequestMapping("/network/candidates")
+    public Network candidateContributionNetwork(
+            @RequestParam(value = "candId", required = false) Stack<String> candidateIds) {
+        logger.info("Input request parameters: {}", candidateIds.toString());
+        // http://127.0.0.1:8080/network/candidates?candId=H2MA04073&candId=S2MA00170
+        // this works! use the above to get union of funders between Warren and Kennedy!
+        Network candidateContributionNetwork;
+        List<Network.NetworkNode> nodes = new ArrayList<>();
+        List<Network.NetworkLink> links = new ArrayList<>();
+        try {
+            logger.info("Mapping candidates to their contributors and contributions...");
+            logger.info("{}", candidateIds.toString());
+            Map<String, Map<String, List<Contribution>>> contributionsToCandByCmte = context.getContributions()
+                    .stream()
+                    .filter(c -> candidateIds.contains(c.getCandidateId()))
+                    .collect(Collectors.groupingBy(
+                            Contribution::getCandidateId, Collectors.groupingBy(
+                                    Contribution::getCommitteeId)));
+            logger.info("{}", contributionsToCandByCmte.size());
+            logger.info("{}", contributionsToCandByCmte.keySet());
+
+            logger.info("Generating candidate and committee nodes...");
+            while (!candidateIds.isEmpty()) {
+                String candidateId = candidateIds.pop();
+                logger.info("Processing candidate {}...", candidateId);
+                if (!context.getCandidatesMap().containsKey(candidateId)){
+                    logger.info("Candidate {} does not exist in the loaded records...moving on",
+                            candidateId);
+                    break;
+                }
+                Candidate candidate = context.getCandidatesMap().get(candidateId);
+
+                logger.info("Building network node for candidate {}", candidateId);
+                Network.NetworkNode candidateNode = new Network.NetworkNode(
+                        candidate.getCandidateId(),
+                        candidate.getCandidateName(),
+                        candidate.getState(),
+                        candidate.getPartyDesignation());
+                nodes.add(candidateNode);
+
+                for (String otherCandidateId : candidateIds) {
+                    logger.info("Building connections between candidate {} and candidate {}", candidateId, otherCandidateId);
+                    if (!contributionsToCandByCmte.containsKey(candidateId)) {
+                        logger.info("Doesn't look like candidate {} has any contributions...moving on...", otherCandidateId);
+                        break;
+                    }
+                    for (String cmteId : contributionsToCandByCmte.get(candidateId).keySet()) {
+                        logger.info("Determing links via committee {}", cmteId);
+                        if (contributionsToCandByCmte.get(otherCandidateId).containsKey(cmteId)) {
+                            logger.info("Committee {} has contributed to both {} and {}, adding committee as node...",
+                                    cmteId, candidateId, otherCandidateId);
+                            Committee committee = context.getCommitteesMap().get(cmteId);
+
+                            logger.info("Adding network node for committee {}", cmteId);
+                            Network.NetworkNode commmitteeNode = new Network.NetworkNode(
+                                    committee.getCommitteeId(),
+                                    committee.getCommitteeName(),
+                                    committee.getState(),
+                                    committee.getCommitteParty()
+                            );
+                            logger.info("Adding committee node to node list...");
+                            nodes.add(commmitteeNode);
+
+                            logger.info("Adding links between candidates {} and {} via shared contributor {}",
+                                    candidateId, otherCandidateId, cmteId);
+                            Network.NetworkLink cmteToCand1Link = new Network.NetworkLink(cmteId, candidateId);
+                            Network.NetworkLink cmteToCand2Link = new Network.NetworkLink(cmteId, otherCandidateId);
+                            links.add(cmteToCand1Link);
+                            links.add(cmteToCand2Link);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Encountered an unexpected error while constructing graph;", e);
+        }
+        logger.info("Constructing graph from nodes and links objects...");
+        candidateContributionNetwork = new Network(nodes, links);
+        logger.info("Finished constructing contribution network...");
+        return candidateContributionNetwork;
     }
 }
