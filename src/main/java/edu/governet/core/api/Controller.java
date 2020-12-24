@@ -22,6 +22,9 @@ public class Controller {
     private static final String DATA_SUBDIRECTORY = "/data/";
     private static final String CROSS_ORIGIN_ACCEPT_LOCAL = "http://localhost:8081";
 
+    private static final String CANDIDATE_TYPE_IDENTIFIER = "CANDIDATE";
+    private static final String COMMITTEE_TYPE_IDENTIFIER = "COMMITTEE";
+
     private static final Logger logger = LogManager.getLogger(Controller.class);
 
     AppInit init = new AppInit().withDataDirectory(DATA_SUBDIRECTORY);
@@ -168,7 +171,7 @@ public class Controller {
                 .stream()
                 .limit(100000)
                 .map(c -> new Network.NetworkNode(
-                        c.getCandidateId(), c.getCandidateName(), "female", c.getPartyDesignation()))
+                        c.getCandidateId(), c.getCandidateName(), c.getPartyDesignation(), CANDIDATE_TYPE_IDENTIFIER))
                 .collect(Collectors.toList());
 
         return new Network(nodes, links);
@@ -250,8 +253,8 @@ public class Controller {
                 Network.NetworkNode candidateNode = new Network.NetworkNode(
                         candidate.getCandidateId(),
                         candidate.getCandidateName(),
-                        candidate.getState(),
-                        candidate.getPartyDesignation());
+                        candidate.getPartyDesignation(),
+                        CANDIDATE_TYPE_IDENTIFIER);
                 nodes.add(candidateNode);
 
                 for (String otherCandidateId : candidateIds) {
@@ -271,11 +274,109 @@ public class Controller {
                             Network.NetworkNode commmitteeNode = new Network.NetworkNode(
                                     committee.getCommitteeId(),
                                     committee.getCommitteeName(),
-                                    committee.getState(),
-                                    committee.getCommitteParty()
+                                    committee.getCommitteParty(),
+                                    COMMITTEE_TYPE_IDENTIFIER
                             );
                             logger.info("Adding committee node to node list...");
                             nodes.add(commmitteeNode);
+
+                            logger.info("Adding links between candidates {} and {} via shared contributor {}",
+                                    candidateId, otherCandidateId, cmteId);
+                            Network.NetworkLink cmteToCand1Link = new Network.NetworkLink(cmteId, candidateId);
+                            Network.NetworkLink cmteToCand2Link = new Network.NetworkLink(cmteId, otherCandidateId);
+                            links.add(cmteToCand1Link);
+                            links.add(cmteToCand2Link);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Encountered an unexpected error while constructing graph;", e);
+        }
+        logger.info("Constructing graph from nodes and links objects...");
+        candidateContributionNetwork = new Network(nodes, links);
+        logger.info("Finished constructing contribution network...");
+        return candidateContributionNetwork;
+    }
+
+    @CrossOrigin(origins = CROSS_ORIGIN_ACCEPT_LOCAL)
+    @RequestMapping("/network/candidates/full")
+    public Network candidateContributionNetworkFull(){
+        Network candidateContributionNetwork;
+        Stack<String> candidateIds = new Stack<>();
+
+        candidateIds.addAll(context.getCandidates().stream()
+                .map(Candidate::getCandidateId)
+                .filter(candId -> context.getCandidatesMap().get(candId).getState().equals("MA"))
+                .collect(Collectors.toList()));
+
+        List<Network.NetworkNode> nodes = new ArrayList<>();
+        List<Network.NetworkLink> links = new ArrayList<>();
+        try {
+            logger.info("Mapping candidates to their contributors and contributions...");
+            logger.info("{}", candidateIds.toString());
+            Map<String, Map<String, List<Contribution>>> contributionsToCandByCmte = context.getContributions()
+                    .stream()
+                    .filter(c -> candidateIds.contains(c.getCandidateId()))
+                    .collect(Collectors.groupingBy(
+                            Contribution::getCandidateId, Collectors.groupingBy(
+                                    Contribution::getCommitteeId)));
+            logger.info("{}", contributionsToCandByCmte.size());
+            logger.info("{}", contributionsToCandByCmte.keySet());
+
+            logger.info("Generating candidate and committee nodes...");
+            while (!candidateIds.isEmpty()) {
+                String candidateId = candidateIds.pop();
+                logger.info("Processing candidate {}...", candidateId);
+                if (!context.getCandidatesMap().containsKey(candidateId)){
+                    logger.info("Candidate {} does not exist in the loaded records...moving on",
+                            candidateId);
+                    continue;
+                }
+
+                if (!contributionsToCandByCmte.containsKey(candidateId)) {
+                    logger.info("Doesn't look like candidate {} has any contributions...moving on...", candidateId);
+                    continue;
+                }
+
+                Candidate candidate = context.getCandidatesMap().get(candidateId);
+
+                try {
+                    logger.info("Building network node for candidate {}", candidateId);
+                    Network.NetworkNode candidateNode = new Network.NetworkNode(
+                            candidate.getCandidateId(),
+                            candidate.getCandidateName(),
+                            candidate.getPartyDesignation(),
+                            CANDIDATE_TYPE_IDENTIFIER);
+                    nodes.add(candidateNode);
+                } catch (Exception e) {
+                    logger.error("Failed to generate candidate node for candidate {}; moving on;", candidateId, e);
+                    continue;
+                }
+
+                for (String otherCandidateId : candidateIds) {
+                    logger.info("Building connections between candidate {} and candidate {}", candidateId, otherCandidateId);
+                    for (String cmteId : contributionsToCandByCmte.get(candidateId).keySet()) {
+                        logger.info("Determing links via committee {}", cmteId);
+                        if (contributionsToCandByCmte.containsKey(otherCandidateId) && contributionsToCandByCmte.get(otherCandidateId).containsKey(cmteId)) {
+                            logger.info("Committee {} has contributed to both {} and {}, adding committee as node...",
+                                    cmteId, candidateId, otherCandidateId);
+                            Committee committee = context.getCommitteesMap().get(cmteId);
+
+                            try {
+                                logger.info("Adding network node for committee {}", cmteId);
+                                Network.NetworkNode committeeNode = new Network.NetworkNode(
+                                        committee.getCommitteeId(),
+                                        committee.getCommitteeName(),
+                                        committee.getCommitteParty(),
+                                        COMMITTEE_TYPE_IDENTIFIER
+                                );
+                                nodes.add(committeeNode);
+                            } catch (Exception e) {
+                                logger.info("Failed to generate committee node; moving on;", e);
+                                continue;
+                            }
+                            logger.info("Adding committee node to node list...");
 
                             logger.info("Adding links between candidates {} and {} via shared contributor {}",
                                     candidateId, otherCandidateId, cmteId);

@@ -22,13 +22,13 @@ public class Network {
     public static class NetworkNode {
         String id;
         String name;
-        String gender;
+        String type;
         String party;
 
-        public NetworkNode(String id, String name, String gender, String party) {
+        public NetworkNode(String id, String name, String party, String type) {
             this.id = id;
             this.name = name;
-            this.gender = gender;
+            this.type = type;
             this.party = party;
         }
 
@@ -40,8 +40,8 @@ public class Network {
             return name;
         }
 
-        public String getGender() {
-            return gender;
+        public String getType() {
+            return type;
         }
 
         public String getParty() {
